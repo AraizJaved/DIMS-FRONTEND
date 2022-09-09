@@ -1,0 +1,65 @@
+.shadow-box-example {
+  height: 120px;
+  width: 100%;
+  background-color: #64b5f6;
+}
+
+ul {
+  list-style: disc;
+}
+
+li {
+  float: left;
+  margin: 0 20px;
+}
+
+.pass-wrapper {
+  position: relative;
+  display: flex;
+  margin-bottom: 14px;
+}
+
+
+i {
+  position: absolute;
+  top: 38%;
+  right: 70%;
+}
+
+i:hover {
+  color: #00fcb6;
+  cursor: pointer;
+}
+
+#photo {
+  width: 100;
+  height: 100px;
+}
+
+.list {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-content: center;
+  flex-wrap: wrap;
+  margin-top: auto;
+}
+
+.button-solid {
+  border: none;
+  background-color: white;
+  color: #8fb339;
+}
+
+button-solid:focus {
+  border: none;
+  outline: none;
+}
+
+.dashboardCards:hover{
+  cursor: pointer;
+}
+thead{
+  background-color: #8fb339;
+  width: 100%;
+}
