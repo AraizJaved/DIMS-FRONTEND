@@ -16,16 +16,18 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
+import CancelIcon from '@mui/icons-material/Cancel';
 const required = (val) => val && val.length;
 const isNumber = (val) => !isNaN(Number(val));
 const Length = () => (val) => !val || val.length == 11;
 const DrugProfile = () => {
     let history = useNavigate();
     const [open, setOpen] = useState(false);
+    const [open2, setOpen2] = useState(false);
     const [Msg, setMsg] = useState(false);
     const [country, setCountry] = useState('Pakistan');
     const [drugName, setDrugName] = useState("");
-    const [drugRegistrationNo, setDrugRegistrationNo] = useState();
+    const [drugRegistrationNo, setDrugRegistrationNo] = useState("");
     const [manufacturer, setManufacturer] = useState("");
     const [address, setAddress] = useState("");
     const [dmlNo, setDmlNo] = useState("");
@@ -41,19 +43,19 @@ const DrugProfile = () => {
     const [importLicenseNo, setImportLicenseNo] = useState("");
     const options = useMemo(() => countryList().getData(), []);
     const [medicine, setMedicine] = useState('');
-    function resetForm(){
+    function resetForm() {
         setDrugName("")
         setDrugRegistrationNo("")
-        setAddress("")
         setAddress("")
         setDmlNo("")
         setPakistanImporter("")
         setImporterPakistanAdress("")
         setStrength("")
+        setStrengthUnits("select")
         setVolume("")
-        setVolUnits("")
+        setVolUnits("Select")
         setPcktSize("")
-        setDosageForm("")
+        setDosageForm("Select Dosage Form");
         setMrp("")
         setImportLicenseNo("")
         setMedicine("")
@@ -89,6 +91,7 @@ const DrugProfile = () => {
     const handleClose = () => {
 
         setOpen(false);
+        setOpen2(false);
     };
     function handleChangeCounties(e) {
         debugger
@@ -111,32 +114,99 @@ const DrugProfile = () => {
         setDosageForm(e.target.value)
     }
 
-   
+
     function sendData() {
         debugger
-        let drugProfile = {
-            drugName: drugName,
-            drugRegistrationNo: drugRegistrationNo,
-            medicine: medicine,
-            country: country,
-            manufacturer: manufacturer,
-            address: address,
-            dmlNo: dmlNo,
-            pakistanImporter: pakistanImporter,
-            pakistanImporterAddress: pakistanImporterAddress,
-            importLicenseNo: importLicenseNo,
-            dosageForm: dosageForm,
-            strength: strength,
-            strengthUnits: strengthUnits,
-            volume: volume,
-            volUnits: volUnits,
-            pcktSize: pcktSize,
-            mrp: mrp
+        if (drugName === "") {
+            setMsg("Please enter drug name");
+            setOpen(true);
+            return setMsg;
+        } else if (drugRegistrationNo === "") {
+            setMsg("Please enter drug registration no.");
+            setOpen(true);
+            return setMsg;
+        } else if (medicine === "") {
+            setMsg("Please enter medicine");
+            setOpen(true);
+            return setMsg;
+        } else if (country === "") {
+            setMsg("Please enter country");
+            setOpen(true);
+            return setMsg;
+        } else if (address === "") {
+            setMsg("Please enter address");
+            setOpen(true);
+            return setMsg;
+        } else if (dmlNo === "") {
+            setMsg("Please enter DML No");
+            setOpen(true);
+            return setMsg;
+        } else if (country !== "Pakistan" && pakistanImporter === "") {
+            setMsg("Please enter pakistan importer");
+            setOpen(true);
+            return setMsg;
+        } else if (country !== "Pakistan" && pakistanImporterAddress === "") {
+            setMsg("Please enter pakistan importer address");
+            setOpen(true);
+            return setMsg;
+        } else if (country !== "Pakistan" && importLicenseNo === "") {
+            setMsg("Please enter import license no");
+            setOpen(true);
+            return setMsg;
+        } else if (dosageForm === "") {
+            setMsg("Please enter dosage form");
+            setOpen(true);
+            return setMsg;
+        } else if (strength === "") {
+            setMsg("Please enter strength");
+            setOpen(true);
+            return setMsg;
+        } else if (strengthUnits === "") {
+            setMsg("Please enter strength units");
+            setOpen(true);
+            return setMsg;
+        } else if (volume === "") {
+            setMsg("Please enter volume");
+            setOpen(true);
+            return setMsg;
+        } else if (volUnits === "") {
+            setMsg("Please enter vol units");
+            setOpen(true);
+            return setMsg;
+        } else if (pcktSize === "") {
+            setMsg("Please enter packet size");
+            setOpen(true);
+            return setMsg;
+        } else if (mrp === "") {
+            setMsg("Please enter MRP");
+            setOpen(true);
+            return setMsg;
+        } else {
+            debugger
+            let drugProfile = {
+                drugName: drugName,
+                drugRegistrationNo: drugRegistrationNo,
+                medicine: medicine,
+                country: country,
+                manufacturer: manufacturer,
+                address: address,
+                dmlNo: dmlNo,
+                pakistanImporter: pakistanImporter,
+                pakistanImporterAddress: pakistanImporterAddress,
+                importLicenseNo: importLicenseNo,
+                dosageForm: dosageForm,
+                strength: strength,
+                strengthUnits: strengthUnits,
+                volume: volume,
+                volUnits: volUnits,
+                pcktSize: pcktSize,
+                mrp: mrp
+            }
+            setOpen2(true);
+            object.saveData(drugProfile);
+            setMsg("Record Saved Successfully !")
+            resetForm();
         }
-        object.saveData(drugProfile);
-        setOpen(true);
-        setMsg("Record Saved Successfully !")
-        resetForm();
     }
 
     return (
@@ -146,24 +216,55 @@ const DrugProfile = () => {
             <ArrowBackIcon />
             <button onClick={(() => { history("../dashboard", { replace: true }) })} class="button-solid">go back to Dashboard</button>
             <Dialog
-                open={open}
+                open={
+                    open2 ? (
+                        open2
+                    ) : (
+                        open
+                    )
+                }
                 onClose={handleClose}
                 aria-labelledby="alert-dialog-title"
                 aria-describedby="alert-dialog-description"
             >
                 <DialogTitle id="alert-dialog-title">
-                    <CheckCircleOutlineIcon style={{ width: '100%', color: '#8fb339' }} sx={{ fontSize: 40 }} />
+                    {
+                        open2 === true ? (
+
+                            <CheckCircleOutlineIcon style={{ width: '100%', color: '#8fb339' }} sx={{ fontSize: 40 }} />
+                        ) : (
+
+                            <CancelIcon style={{ width: '100%', color: 'red' }} sx={{ fontSize: 40 }} />
+                        )
+                    }
                 </DialogTitle>
                 <DialogContent>
-                    <DialogContentText style={{ textAlign: 'center', fontSize: '23px', color: '#8fb339' }} id="alert-dialog-description">
-                        {Msg}
-                    </DialogContentText>
+                    {
+                        open2 === true ? (
+                            <DialogContentText style={{ textAlign: 'center', fontSize: '23px', color: '#8fb339' }} id="alert-dialog-description">
+                                {Msg}
+                            </DialogContentText>
+                        ) : (
+                            <DialogContentText style={{ textAlign: 'center', fontSize: '23px', color: 'red' }} id="alert-dialog-description">
+                                {Msg}
+                            </DialogContentText>
+                        )
+                    }
+
                 </DialogContent>
                 <DialogActions>
                     <div class="container">
                         <div class="row">
                             <div class="col text-center">
-                                <Button style={{ backgroundColor: '#8fb339' }} onClick={() => { handleClose() }}>OK</Button>
+                                {
+                                    open2 ? (
+
+                                        <Button style={{ backgroundColor: '#8fb339' }} onClick={() => { handleClose() }}>OK</Button>
+                                    ) : (
+
+                                        <Button onClick={() => { handleClose() }}>OK</Button>
+                                    )
+                                }
                             </div>
                         </div>
                     </div>

@@ -5,7 +5,7 @@ import { Button } from "reactstrap";
 const ReadOnlyRow = ({ drugInfo, handleEditClick, handleDeleteClick }) => {
   return (
     <tr>
-      {console.log('000000000000000000000000000000',drugInfo)}
+      {/* {console.log('000000000000000000000000000000',drugInfo)} */}
       <td>{drugInfo?.productName}</td>
       <td>{drugInfo?.openingBlnc}</td>
       <td>{drugInfo?.batch}</td>

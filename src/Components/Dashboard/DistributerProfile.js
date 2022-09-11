@@ -18,9 +18,14 @@ const isNumber = (val) => !isNaN(Number(val));
 const Length = () => (val) => !val || val.length == 11;
 const DistributerProfile = () => {
     let history = useNavigate();
-    // useEffect(()=>{
-    //     document.getElementById("licenseNum").style.display = "none";
-    // })
+    useEffect(() => {
+
+        console.log("////////////////////////////////////")
+        if (importer === 'No') {
+
+            document.getElementById("araiz").style.display = "none";
+        }
+    })
     const [importerLicenseNo, setImporterLicenseNo] = useState("");
     const [licenseNo, setLicenseNo] = useState("");
     const [importerLicenseNum, setimporterLicenseNum] = useState("");
@@ -36,20 +41,14 @@ const DistributerProfile = () => {
     const [designation, setDesignation] = useState("");
     const [importer, setImporter] = useState("No");
     const [district, setDistrict] = useState("");
+    const [msg, setMsg] = useState("");
     const [open, setOpen] = useState(false);
 
     const handleClose = () => {
 
         setOpen(false);
     };
-    useEffect(() => {
 
-        console.log("////////////////////////////////////")
-        if (importer === 'No') {
-
-            document.getElementById("araiz").style.display = "none";
-        }
-    })
 
     function handleChangeValue(e) {
         // debugger
@@ -65,6 +64,7 @@ const DistributerProfile = () => {
     function handleChangeDistrict(e) {
         debugger
         setDistrict(e.target.value)
+        console.log(district);
     }
 
 
@@ -75,6 +75,80 @@ const DistributerProfile = () => {
         }
     }
 
+    function sendData() {
+        if (licenseNo === "") {
+            setMsg("Please enter license No");
+            setOpen(true);
+            return msg
+        }
+        else if (nameOfDistributer === "") {
+            setMsg("Please enter name of distributer");
+            setOpen(true);
+            return msg
+        }
+        else if (district === "") {
+            setMsg("Please enter division");
+            setOpen(true);
+            return msg
+        }
+        else if (address === "") {
+            setMsg("Please enter address");
+            setOpen(true);
+            return msg
+        }
+        else if (district === "") {
+            setMsg("Please enter district");
+            setOpen(true);
+            return msg
+        }
+        else if (propreitorName === "") {
+            setMsg("Please enter propreitor name");
+            setOpen(true);
+            return msg
+        }
+        else if (PropreitorContact === "") {
+            setMsg("Please enter propreitor contact");
+            setOpen(true);
+            return msg
+        }
+        else if (qualifiedPersonName === "") {
+            setMsg("Please enter qualified person name");
+            setOpen(true);
+            return msg
+        }
+        else if (qualifiedPersonContact === "") {
+            setMsg("Please enter qualified person contact");
+            setOpen(true);
+            return msg
+        }
+        else if ( importer==="Yes" && importerLicenseNum === "") {
+            setMsg("Please enter importer license No.");
+            setOpen(true);
+            return msg
+        }
+        else if (licenseValidUpto === "") {
+            setMsg("Please enter date");
+            setOpen(true);
+            return msg
+        }
+        else if (focalPersonName === "") {
+            setMsg("Please enter focal person name");
+            setOpen(true);
+            return msg
+        }
+        else if (designation === "") {
+            setMsg("Please enter designation");
+            setOpen(true);
+            return msg
+        }
+        else if (focalPersonContact === "") {
+            setMsg("Please enter focal person contact no");
+            setOpen(true);
+            return msg
+        } else {
+            console.log("i am clicked...!");
+        }
+    }
 
     const options = [
         { value: 'Attock', label: 'Attock' },
@@ -113,9 +187,32 @@ const DistributerProfile = () => {
     return (
         <div>
             <Header />
-            {/* {document.getElementById("licenseNum").style.display="none"} */}
             <ArrowBackIcon />
             <button onClick={(() => { history("../dashboard", { replace: true }) })} class="button-solid">go back to Dashboard</button>
+            <Dialog
+                open={open}
+                onClose={handleClose}
+                aria-labelledby="alert-dialog-title"
+                aria-describedby="alert-dialog-description"
+            >
+                <DialogTitle id="alert-dialog-title">
+                    <CancelIcon style={{ width: '100%', color: 'red' }} sx={{ fontSize: 40 }} />
+                </DialogTitle>
+                <DialogContent>
+                    <DialogContentText style={{ textAlign: 'center', fontSize: '23px', color: 'red' }} id="alert-dialog-description">
+                        {msg}
+                    </DialogContentText>
+                </DialogContent>
+                <DialogActions>
+                    <div class="container">
+                        <div class="row">
+                            <div class="col text-center">
+                                <Button onClick={() => { handleClose() }}>OK</Button>
+                            </div>
+                        </div>
+                    </div>
+                </DialogActions>
+            </Dialog>
             <LocalForm >
                 <div className="container" >
                     <div className='row' style={{ marginTop: '50px' }}>
@@ -457,12 +554,11 @@ const DistributerProfile = () => {
                         justifyContent: 'center',
                         boxShadow: '0 0 0px #8fb339',
                     }}
-                    onClick={() => { console.log('i am clicked...!'); }}
+                    onClick={() => { sendData() }}
 
                     size='md'>
                     Save
                 </Button>
-                {/* <Button onClick={() => { _toggle() }}>button</Button> */}
             </div>
         </div>
     )

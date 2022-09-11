@@ -6,11 +6,18 @@ import { useNavigate } from 'react-router-dom';
 import { useState, useEffect, Fragment } from 'react';
 import { Button, FormGroup } from "reactstrap";
 import { LocalForm, Control, Errors } from "react-redux-form";
-import Table from "./Table/table";
-// import data from "./mock-data.json";
-import ReadOnlyRow from "./ReadOnlyRow";
-import EditableRow from "./EditableRow";
 import { nanoid } from "nanoid";
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogContentText from '@mui/material/DialogContentText';
+import DialogTitle from '@mui/material/DialogTitle';
+import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
+import CancelIcon from '@mui/icons-material/Cancel';
+import Table from "./Table/table";
+import ReadOnlyRow from "./Table/ReadOnlyRow";
+import EditableRow from "./Table/EditableRow";
+
 
 
 
@@ -20,16 +27,18 @@ const Length = () => (val) => !val || val.length == 11;
 export default function StockRegister() {
     let history = useNavigate();
     const [open, setOpen] = useState(false);
+    const [open2, setOpen2] = useState(false);
     const [Msg, setMsg] = useState(false);
     const [productName, setProductName] = useState('');
     const [openingBlnc, setOpeningBlnc] = useState("");
-    const [batch, setBatch] = useState();
+    const [batch, setBatch] = useState("");
     const [expDate, setExpDate] = useState("");
     const [mrp, setMrp] = useState("");
     const [qty, setQty] = useState("");
     const [qtyInUnits, setQtyInUnits] = useState('');
     const [drugInfos, setdrugInfos] = useState([]);
-    const [showButton,setShowButton]=useState(false);
+    const [showButton, setShowButton] = useState(false);
+    const [disbale, setDisable] = useState(false);
     useEffect(() => {
         if (!showButton) {
             document.getElementById("finilize").style.display = "none"
@@ -64,25 +73,58 @@ export default function StockRegister() {
     const handleAddFormSubmit = (event) => {
         event.preventDefault();
 
-        debugger
-        const newdrugInfo = {
-            id: nanoid(),
-            productName: productName,
-            openingBlnc: openingBlnc,
-            batch: batch,
-            expDate: expDate,
-            mrp: mrp,
-            qty: qty
-        };
+        if (productName === "") {
+            setMsg("Please enter product name");
+            setOpen(true);
+            return setMsg;
+        }
+        else if (openingBlnc === "") {
+            setMsg("Please enter opening balance");
+            setOpen(true);
+            return setMsg;
+        }
+        else if (batch === "") {
+            setMsg("Please enter batch");
+            setOpen(true);
+            return setMsg;
+        }
+        else if (expDate === "") {
+            setMsg("Please enter expiry date");
+            setOpen(true);
+            return setMsg;
+        }
+        else if (mrp === "") {
+            setMsg("Please enter MRP");
+            setOpen(true);
+            return setMsg;
+        }
+        else if (qty === "") {
+            setMsg("Please enter quantity");
+            setOpen(true);
+            return setMsg;
+        } else {
+            debugger
+            const newdrugInfo = {
+                id: nanoid(),
+                productName: productName,
+                openingBlnc: openingBlnc,
+                batch: batch,
+                expDate: expDate,
+                mrp: mrp,
+                qty: qty
+            };
 
-        const newdrugInfos = [...drugInfos, newdrugInfo];
-        setdrugInfos(newdrugInfos);
-        console.log(drugInfos)
-        setShowButton(true)
+            const newdrugInfos = [...drugInfos, newdrugInfo];
+            setdrugInfos(newdrugInfos);
+            console.log(drugInfos)
+            setShowButton(true)
+            resetForm();
+        }
     };
 
     const handleEditFormSubmit = (event) => {
         event.preventDefault();
+        setDisable(false);
 
         const editeddrugInfo = {
             id: editdrugInfoId,
@@ -105,6 +147,7 @@ export default function StockRegister() {
     };
 
     const handleEditClick = (event, drugInfo) => {
+        setDisable(true);
         event.preventDefault();
         setEditdrugInfoId(drugInfo.id);
 
@@ -121,7 +164,13 @@ export default function StockRegister() {
     };
 
     const handleCancelClick = () => {
+        setDisable(false);
         setEditdrugInfoId(null);
+    };
+    const handleClose = () => {
+
+        setOpen(false);
+        setOpen2(false);
     };
 
     const handleDeleteClick = (drugInfoId) => {
@@ -133,11 +182,83 @@ export default function StockRegister() {
 
         setdrugInfos(newdrugInfos);
     }
+
+    const resetForm = () => {
+        setProductName("");
+        setOpeningBlnc("");
+        setBatch("");
+        setExpDate("");
+        setMrp("");
+        setQty("");
+    }
+
+    const sendData = () => {
+        console.log('////////////////////////', drugInfos)
+        setdrugInfos([]);
+        setShowButton(false)
+        setOpen2(true);
+        setMsg("Record Finilized Successfully");
+    }
     return (
         <>
             <Header />
             <ArrowBackIcon />
             <button onClick={(() => { history("../dashboard", { replace: true }) })} class="button-solid">go back to Dashboard</button>
+            <Dialog
+                open={
+                    open2 ? (
+                        open2
+                    ) : (
+                        open
+                    )
+                }
+                onClose={handleClose}
+                aria-labelledby="alert-dialog-title"
+                aria-describedby="alert-dialog-description"
+            >
+                <DialogTitle id="alert-dialog-title">
+                    {
+                        open2 === true ? (
+
+                            <CheckCircleOutlineIcon style={{ width: '100%', color: '#8fb339' }} sx={{ fontSize: 40 }} />
+                        ) : (
+
+                            <CancelIcon style={{ width: '100%', color: 'red' }} sx={{ fontSize: 40 }} />
+                        )
+                    }
+                </DialogTitle>
+                <DialogContent>
+                    {
+                        open2 === true ? (
+                            <DialogContentText style={{ textAlign: 'center', fontSize: '23px', color: '#8fb339' }} id="alert-dialog-description">
+                                {Msg}
+                            </DialogContentText>
+                        ) : (
+                            <DialogContentText style={{ textAlign: 'center', fontSize: '23px', color: 'red' }} id="alert-dialog-description">
+                                {Msg}
+                            </DialogContentText>
+                        )
+                    }
+
+                </DialogContent>
+                <DialogActions>
+                    <div class="container">
+                        <div class="row">
+                            <div class="col text-center">
+                                {
+                                    open2 ? (
+
+                                        <Button style={{ backgroundColor: '#8fb339' }} onClick={() => { handleClose() }}>OK</Button>
+                                    ) : (
+
+                                        <Button onClick={() => { handleClose() }}>OK</Button>
+                                    )
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </DialogActions>
+            </Dialog>
             <LocalForm >
                 <div className="container">
                     <div className='row' style={{ marginTop: '20px' }} >
@@ -370,10 +491,10 @@ export default function StockRegister() {
                             height: '40px',
                             borderRadius: '10px',
                             justifyContent: 'center',
-                            boxShadow: '0 0 0px #8fb339',
+                            boxShadow: '0 0 0px #8fb339'
                         }}
-                        onClick={console.log("i am cliked")}
-
+                        onClick={() => { sendData() }}
+                        disabled={disbale}
                         size='md'>
                         Finilize
                     </Button>
