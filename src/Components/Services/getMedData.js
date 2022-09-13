@@ -21,6 +21,18 @@ const object = {
         return axios.post('http://localhost:3001/api/saveMedData', {
             drugProfile: drugProfile
         })
+    },
+
+    getDistributerData(licenseNo){
+        return axios.post("http://localhost:3001/api/getDistributerData", {
+            licenseNo: licenseNo
+        })
+    },
+
+    saveDistributerData(distributerProfile){
+        return axios.post("http://localhost:3001/api/saveDistributerData", {
+            distributerProfile: distributerProfile
+        })
     }
 }
 

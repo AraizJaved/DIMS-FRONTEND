@@ -14,9 +14,12 @@ import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import CancelIcon from '@mui/icons-material/Cancel';
+import Combobox from "react-widgets/Combobox";
+import axios from 'axios';
 import Table from "./Table/table";
 import ReadOnlyRow from "./Table/ReadOnlyRow";
 import EditableRow from "./Table/EditableRow";
+import { ContactSupportOutlined } from "@mui/icons-material";
 
 
 
@@ -39,12 +42,16 @@ export default function StockRegister() {
     const [drugInfos, setdrugInfos] = useState([]);
     const [showButton, setShowButton] = useState(false);
     const [disbale, setDisable] = useState(false);
+    const [medicine, setMedicine] = useState('');
+    let [MedData, setMedData] = useState([])
+    let _MedData = [];
     useEffect(() => {
         if (!showButton) {
             document.getElementById("finilize").style.display = "none"
         } else {
             document.getElementById("finilize").style.display = "block"
         }
+        // console.log('1111111111111111',medicine[0])
     })
 
     const [editFormData, setEditFormData] = useState({
@@ -54,6 +61,7 @@ export default function StockRegister() {
         expDate: "",
         mrp: "",
         qty: "",
+        qtyInUnits:""
     });
 
     const [editdrugInfoId, setEditdrugInfoId] = useState(null);
@@ -111,7 +119,8 @@ export default function StockRegister() {
                 batch: batch,
                 expDate: expDate,
                 mrp: mrp,
-                qty: qty
+                qty: qty,
+                qtyInUnits:qtyInUnits
             };
 
             const newdrugInfos = [...drugInfos, newdrugInfo];
@@ -134,6 +143,7 @@ export default function StockRegister() {
             expDate: editFormData.expDate,
             mrp: editFormData.mrp,
             qty: editFormData.qty,
+            qtyInUnits:editFormData.qtyInUnits
         };
 
         const newdrugInfos = [...drugInfos];
@@ -158,6 +168,7 @@ export default function StockRegister() {
             expDate: drugInfo?.expDate,
             mrp: drugInfo?.mrp,
             qty: drugInfo?.qty,
+            qtyInUnits:drugInfo?.qtyInUnits
         };
 
         setEditFormData(formValues);
@@ -181,23 +192,62 @@ export default function StockRegister() {
         newdrugInfos.splice(index, 1);
 
         setdrugInfos(newdrugInfos);
+        setShowButton(false)
     }
 
     const resetForm = () => {
+        setMedicine("");
         setProductName("");
         setOpeningBlnc("");
         setBatch("");
         setExpDate("");
         setMrp("");
         setQty("");
+        setQtyInUnits("");
     }
 
     const sendData = () => {
         console.log('////////////////////////', drugInfos)
-        setdrugInfos([]);
-        setShowButton(false)
-        setOpen2(true);
-        setMsg("Record Finilized Successfully");
+
+        axios.post("http://localhost:3001/api/finilizeMedicine", {
+            values : drugInfos
+        }).then((res) => {
+            setdrugInfos([]);
+            setShowButton(false)
+            setOpen2(true);
+            setMsg("Record Finilized Successfully");
+            resetForm();
+        }).catch(() => {
+            console.log("error........!")
+        })
+    }
+    const changeValue = (e) => {
+        console.log(" i am clicked", e);
+        setMedicine(e)
+        // debugger
+        axios.post('http://localhost:3001/api/getMedicines', {
+            values: e
+        }).then((res) => {
+            res.data.recordsets[0].forEach(element => {
+                _MedData.push(Object.values(element))
+            });
+            setMedData(_MedData)
+        }).catch(() => {
+            console.log("error........!")
+        })
+
+
+        axios.post('http://localhost:3001/api/medData', {
+            values: e
+        }).then((res) => {
+
+            setMrp(res.data.recordsets[0][0].MRP);
+            setQty(res.data.recordsets[0][0].PackSize);
+            setQtyInUnits((res.data.recordsets[0][0].MRP) * (res.data.recordsets[0][0].PackSize))
+            setProductName(res.data.recordsets[0][0].DrugName)
+        }).catch(() => {
+            console.log("error---------------!")
+        })
     }
     return (
         <>
@@ -265,7 +315,7 @@ export default function StockRegister() {
                         <div className="col-sm-4">
                             <FormGroup md={10}>
                                 <span style={{ color: "#8fb339" }} htmlFor="productName">Product Name *</span>
-                                <Control.text style={{ border: '1px solid #8fb339', borderRadius: '8px', height: '35px', boxShadow: '0 0 0px #8fb339', }}
+                                {/* <Control.text style={{ border: '1px solid #8fb339', borderRadius: '8px', height: '35px', boxShadow: '0 0 0px #8fb339', }}
                                     model=".productName"
                                     placeholder="Product Name"
                                     className="form-control"
@@ -282,7 +332,14 @@ export default function StockRegister() {
                                     messages={{
                                         required: "Product Name is required "
                                     }}
-                                ></Errors>
+                                ></Errors> */}
+                                <Combobox
+                                    data={MedData}
+                                    textField="name"
+                                    value={medicine}
+                                    onChange={(e) => { changeValue(e) }}
+                                // hideEmptyPopup
+                                />
                             </FormGroup>
                         </div>
                         <div className='col-sm-4'>
@@ -372,6 +429,7 @@ export default function StockRegister() {
                                     type='number'
                                     value={mrp}
                                     maxLength='11'
+                                    disabled
                                     onChange={(e) => { setMrp(e.target.value) }}
                                     validators={{
                                         required
@@ -395,6 +453,7 @@ export default function StockRegister() {
                                     placeholder="Enter qunatity"
                                     className="form-control"
                                     value={qty}
+                                    disabled
                                     maxLength='11'
                                     onChange={(e) => { setQty(e.target.value) }}
                                     validators={{
@@ -417,9 +476,9 @@ export default function StockRegister() {
                                 <Control.text style={{ border: '1px solid #8fb339', borderRadius: '8px', height: '35px', boxShadow: '0 0 0px #8fb339' }}
                                     model=".qtyInUnits"
                                     className="form-control"
-                                    value={63.54}
+                                    value={qtyInUnits}
                                     disabled
-                                    onChange={(e) => { setQtyInUnits(e.target.value) }}
+                                    onChange={(e) => { setQtyInUnits(mrp * qty) }}
                                     validators={{
                                         required
                                     }}

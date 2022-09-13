@@ -72,14 +72,6 @@ export default function Dashboard() {
                                 <p style={{ position: 'relative', left: '55px', top: '5px' }}>Sale Register</p>
                             </div>
                         </div>
-                        <div class="col-sm-4">
-                            <div style={{ borderRadius: '15px', height: 200, width: 250, boxShadow: "0 3px 10px rgb(0 0 0 / 0.4)" }}>
-                                <CardImg className="dashboardCards" onClick={() => { history("../dashboard/DrugProfile", { replace: true }) }} style={{ height: 150, width: 200, position: 'relative', left: '20px', top: '5px' }}
-                                    src={drugProfile}
-                                    alt="GFG Logo" />
-                                <p style={{ position: 'relative', left: '80px', top: '5px' }}>Drug Profile</p>
-                            </div>
-                        </div>
                     </div>
                 </div>
             </div>

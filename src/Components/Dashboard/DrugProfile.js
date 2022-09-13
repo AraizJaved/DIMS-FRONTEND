@@ -7,8 +7,6 @@ import { useState, useMemo, useEffect } from 'react';
 import { Button, FormGroup } from "reactstrap";
 import { LocalForm, Control, Errors } from "react-redux-form";
 import object from '../Services/getMedData.js';
-import Combobox from "react-widgets/Combobox";
-import axios from 'axios';
 import "react-widgets/styles.css";
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';

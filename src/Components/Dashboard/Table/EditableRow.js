@@ -38,7 +38,7 @@ const EditableRow = ({
       </td>
       <td>
         <input
-          type="text"
+          type="date"
           placeholder="Enter Exp Date"
           name="expDate"
           value={editFormData.expDate}
@@ -52,6 +52,7 @@ const EditableRow = ({
           name="mrp"
           value={editFormData.mrp}
           onChange={handleEditFormChange}
+          disabled
         ></input>
       </td>
       <td>
@@ -59,6 +60,7 @@ const EditableRow = ({
           type="text"
           placeholder="Enter Quantity"
           name="qty"
+          disabled
           value={editFormData.qty}
           onChange={handleEditFormChange}
         ></input>

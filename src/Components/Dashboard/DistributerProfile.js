@@ -8,7 +8,9 @@ import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
+import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import CancelIcon from '@mui/icons-material/Cancel';
+import object from '../Services/getMedData';
 
 import Header from "./header";
 import '../../Components/style.css';
@@ -19,8 +21,6 @@ const Length = () => (val) => !val || val.length == 11;
 const DistributerProfile = () => {
     let history = useNavigate();
     useEffect(() => {
-
-        console.log("////////////////////////////////////")
         if (importer === 'No') {
 
             document.getElementById("araiz").style.display = "none";
@@ -41,12 +41,17 @@ const DistributerProfile = () => {
     const [designation, setDesignation] = useState("");
     const [importer, setImporter] = useState("No");
     const [district, setDistrict] = useState("");
+    const [town, setTown] = useState("");
+    const [townId, setTownId] = useState("");
+    const [districtId, setDistrictId] = useState("");
+    const [districtCode, setDistrictCode] = useState("");
     const [msg, setMsg] = useState("");
     const [open, setOpen] = useState(false);
+    const [open2, setOpen2] = useState(false);
 
     const handleClose = () => {
-
         setOpen(false);
+        setOpen2(false);
     };
 
 
@@ -54,7 +59,6 @@ const DistributerProfile = () => {
         // debugger
         setImporter(e.target.value)
         if (e.target.value === 'Yes') {
-            console.log(e.target.value)
             document.getElementById("araiz").style.display = "block";
         } else {
             document.getElementById("araiz").style.display = "none";
@@ -69,40 +73,35 @@ const DistributerProfile = () => {
 
 
     if (importer === "No") {
-        console.log("jsdhfdsfhkjsdh")
         if (document.getElementById("licenseNum") != null) {
             document.getElementById("licenseNum").style.display = "none"
         }
     }
 
-    function sendData() {
+    const resetForm = () => {
+        setLicenseNo("");
+        setimporterLicenseNum("");
+        setNameOfDistributer("");
+        setPropreitorName("");
+        setQualifiedPersonName("");
+        setLicenseValidUpto("");
+        setFocalPersonName("");
+        setPropreitorContact("");
+        setQualifiedPersonContact("");
+        setFocalPersonContact("");
+        setAddress("");
+        setDesignation("");
+        setImporter("");
+        setDistrict("");
+        setTown("");
+        setTownId("");
+        setDistrictId("");
+        setDistrictCode("");
+    }
+
+    async function sendData() {
         if (licenseNo === "") {
             setMsg("Please enter license No");
-            setOpen(true);
-            return msg
-        }
-        else if (nameOfDistributer === "") {
-            setMsg("Please enter name of distributer");
-            setOpen(true);
-            return msg
-        }
-        else if (district === "") {
-            setMsg("Please enter division");
-            setOpen(true);
-            return msg
-        }
-        else if (address === "") {
-            setMsg("Please enter address");
-            setOpen(true);
-            return msg
-        }
-        else if (district === "") {
-            setMsg("Please enter district");
-            setOpen(true);
-            return msg
-        }
-        else if (propreitorName === "") {
-            setMsg("Please enter propreitor name");
             setOpen(true);
             return msg
         }
@@ -111,23 +110,13 @@ const DistributerProfile = () => {
             setOpen(true);
             return msg
         }
-        else if (qualifiedPersonName === "") {
-            setMsg("Please enter qualified person name");
-            setOpen(true);
-            return msg
-        }
         else if (qualifiedPersonContact === "") {
             setMsg("Please enter qualified person contact");
             setOpen(true);
             return msg
         }
-        else if ( importer==="Yes" && importerLicenseNum === "") {
+        else if (importer === "Yes" && importerLicenseNum === "") {
             setMsg("Please enter importer license No.");
-            setOpen(true);
-            return msg
-        }
-        else if (licenseValidUpto === "") {
-            setMsg("Please enter date");
             setOpen(true);
             return msg
         }
@@ -146,7 +135,64 @@ const DistributerProfile = () => {
             setOpen(true);
             return msg
         } else {
-            console.log("i am clicked...!");
+            let distributerProfile = {
+                licenseNo: licenseNo,
+                importerLicenseNum: importerLicenseNum,
+                nameOfDistributer: nameOfDistributer,
+                propreitorName: propreitorName,
+                qualifiedPersonName: qualifiedPersonName,
+                licenseValidUpto: licenseValidUpto,
+                focalPersonName: focalPersonName,
+                PropreitorContact: PropreitorContact,
+                qualifiedPersonContact: qualifiedPersonContact,
+                focalPersonContact: focalPersonContact,
+                address: address,
+                designation: designation,
+                district: district,
+                town: town,
+                townId: townId,
+                districtId: districtId,
+                districtCode: districtCode
+            }
+            debugger
+            let result = await object.saveDistributerData(distributerProfile)
+            if (result != null) {
+                console.log("data saved sucessfully");
+                setMsg("Data saved sucessfully");
+                setOpen2(true);
+                resetForm();
+                return msg
+            }
+        }
+    }
+
+    async function findLicenseNo() {
+        const license = licenseNo.split("-");
+        debugger
+        if (licenseNo[licenseNo.length - 1] !== 'D') {
+            setOpen(true)
+            setMsg("License No is not valid");
+        } else if (license.length !== 4) {
+            setOpen(true)
+            setMsg("License No is not valid");
+        } else {
+            let result = await object.getDistributerData(licenseNo)
+            const data = result.data.recordsets[0][0];
+            if (result.data.recordsets[0].length > 0) {
+                setNameOfDistributer(data.Proprietor_Of_MS);
+                setDistrict(data.District_Name);
+                setLicenseValidUpto((data.ExpirayDate).split("T")[0]);
+                setAddress(data.Premises_Address);
+                setTown(data.Town_Name);
+                setPropreitorName(data.propreitorName);
+                setQualifiedPersonName(data.qualifiedPersonName);
+                setTownId(data.Town_ID)
+                setDistrictId(data.District_ID)
+                setDistrictCode(data.District_Code)
+            } else {
+                setOpen(true)
+                setMsg("License No not found");
+            }
         }
     }
 
@@ -190,24 +236,55 @@ const DistributerProfile = () => {
             <ArrowBackIcon />
             <button onClick={(() => { history("../dashboard", { replace: true }) })} class="button-solid">go back to Dashboard</button>
             <Dialog
-                open={open}
+                open={
+                    open2 ? (
+                        open2
+                    ) : (
+                        open
+                    )
+                }
                 onClose={handleClose}
                 aria-labelledby="alert-dialog-title"
                 aria-describedby="alert-dialog-description"
             >
                 <DialogTitle id="alert-dialog-title">
-                    <CancelIcon style={{ width: '100%', color: 'red' }} sx={{ fontSize: 40 }} />
+                    {
+                        open2 === true ? (
+
+                            <CheckCircleOutlineIcon style={{ width: '100%', color: '#8fb339' }} sx={{ fontSize: 40 }} />
+                        ) : (
+
+                            <CancelIcon style={{ width: '100%', color: 'red' }} sx={{ fontSize: 40 }} />
+                        )
+                    }
                 </DialogTitle>
                 <DialogContent>
-                    <DialogContentText style={{ textAlign: 'center', fontSize: '23px', color: 'red' }} id="alert-dialog-description">
-                        {msg}
-                    </DialogContentText>
+                    {
+                        open2 === true ? (
+                            <DialogContentText style={{ textAlign: 'center', fontSize: '23px', color: '#8fb339' }} id="alert-dialog-description">
+                                {msg}
+                            </DialogContentText>
+                        ) : (
+                            <DialogContentText style={{ textAlign: 'center', fontSize: '23px', color: 'red' }} id="alert-dialog-description">
+                                {msg}
+                            </DialogContentText>
+                        )
+                    }
+
                 </DialogContent>
                 <DialogActions>
                     <div class="container">
                         <div class="row">
                             <div class="col text-center">
-                                <Button onClick={() => { handleClose() }}>OK</Button>
+                                {
+                                    open2 ? (
+
+                                        <Button style={{ backgroundColor: '#8fb339' }} onClick={() => { handleClose() }}>OK</Button>
+                                    ) : (
+
+                                        <Button onClick={() => { handleClose() }}>OK</Button>
+                                    )
+                                }
                             </div>
                         </div>
                     </div>
@@ -216,7 +293,7 @@ const DistributerProfile = () => {
             <LocalForm >
                 <div className="container" >
                     <div className='row' style={{ marginTop: '50px' }}>
-                        <div className="col-sm-4">
+                        <div className="col-sm-3">
                             <FormGroup md={10}>
                                 <span style={{ color: "#8fb339" }} htmlFor="licenseNo">License No *</span>
                                 <Control.text style={{ border: '1px solid #8fb339', borderRadius: '8px', height: '35px', boxShadow: '0 0 0px #8fb339', width: '325px' }}
@@ -240,6 +317,25 @@ const DistributerProfile = () => {
                                 ></Errors>
                             </FormGroup>
                         </div>
+                        <div className="col-sm-2">
+                            {/* <span style={{ color: "#8fb339" }} htmlFor="licenseNo">......</span> */}
+
+                            <Button
+                                style={{
+                                    width: '120px',
+                                    background: '#8fb339',
+                                    height: '40px',
+                                    borderRadius: '10px',
+                                    justifyContent: 'center',
+                                    boxShadow: '0 0 0px #8fb339',
+                                    marginTop: '20px'
+                                }}
+                                onClick={() => { findLicenseNo() }}
+
+                                size='md'>
+                                search
+                            </Button>
+                        </div>
                     </div>
                     <div className="row" >
                         <div className="col-sm-3">
@@ -252,7 +348,7 @@ const DistributerProfile = () => {
                                     placeholder="Name of Distributer"
                                     className="form-control"
                                     value={nameOfDistributer}
-                                    onChange={(e) => { setNameOfDistributer(e.target.value) }}
+                                    disabled
                                     validators={{
                                         required
                                     }}
@@ -268,12 +364,19 @@ const DistributerProfile = () => {
                             </FormGroup>
                         </div>
                         <div className='col-sm-3'>
-                            <span style={{ color: "#8fb339" }} htmlFor=" Confirm">Divisions *</span>
-                            <select onChange={handleChangeDistrict} style={{ border: '1px solid #8fb339', boxShadow: '0 0 0px #8fb339', }} select class="form-select" aria-label="Default select example">
-                                {options.map(({ value, label }, index) => <option value={value} >{label}</option>)}
-                            </select>
+                            <span style={{ color: "#8fb339" }} htmlFor=" Confirm">District *</span>
+                            <Control.text style={{ border: '1px solid #8fb339', borderRadius: '8px', height: '35px', boxShadow: '0 0 0px #8fb339' }}
+                                model=".propreitorName"
+                                placeholder="Propreitor's Name"
+                                className="form-control"
+                                value={district}
+                                disabled
+                                validators={{
+                                    required
+                                }}
+                            />
                         </div>
-                        <div className='col-sm-3'>
+                        <div className='col-sm-6'>
                             <FormGroup md={10}>
                                 <span style={{ color: "#8fb339" }} htmlFor="address">Address*</span>
                                 <Control.text style={{ border: '1px solid #8fb339', borderRadius: '8px', height: '35px', boxShadow: '0 0 0px #8fb339' }}
@@ -281,7 +384,7 @@ const DistributerProfile = () => {
                                     placeholder="Enter Address"
                                     className="form-control"
                                     value={address}
-                                    onChange={(e) => { setAddress(e.target.value) }}
+                                    disabled
                                     validators={{
                                         required
                                     }}
@@ -296,15 +399,23 @@ const DistributerProfile = () => {
                                 ></Errors>
                             </FormGroup>
                         </div>
-                        <div className='col-sm-3'>
-                            <span style={{ color: "#8fb339" }} htmlFor=" Confirm">Districts *</span>
-                            <select onChange={handleChangeDistrict} style={{ border: '1px solid #8fb339', boxShadow: '0 0 0px #8fb339', }} select class="form-select" aria-label="Default select example">
-                                {options.map(({ value, label }, index) => <option value={value} >{label}</option>)}
-                            </select>
-                        </div>
+
                     </div>
 
                     <div className='row' >
+                        <div className='col-sm-3'>
+                            <span style={{ color: "#8fb339" }} htmlFor=" Confirm">Town *</span>
+                            <Control.text style={{ border: '1px solid #8fb339', borderRadius: '8px', height: '35px', boxShadow: '0 0 0px #8fb339' }}
+                                model=".propreitorName"
+                                placeholder="Propreitor's Name"
+                                className="form-control"
+                                value={town}
+                                disabled
+                                validators={{
+                                    required
+                                }}
+                            />
+                        </div>
                         <div className='col-sm-3'>
                             <FormGroup md={10}>
                                 <span style={{ color: "#8fb339" }} htmlFor="propreitorName">Propreitor's Name *</span>
@@ -313,7 +424,7 @@ const DistributerProfile = () => {
                                     placeholder="Propreitor's Name"
                                     className="form-control"
                                     value={propreitorName}
-                                    onChange={(e) => { setPropreitorName(e.target.value) }}
+                                    disabled
                                     validators={{
                                         required
                                     }}
@@ -362,7 +473,7 @@ const DistributerProfile = () => {
                                     placeholder="Propreitor's Name"
                                     className="form-control"
                                     value={qualifiedPersonName}
-                                    onChange={(e) => { setQualifiedPersonName(e.target.value) }}
+                                    disabled
                                     validators={{
                                         required
                                     }}
@@ -377,6 +488,10 @@ const DistributerProfile = () => {
                                 ></Errors>
                             </FormGroup>
                         </div>
+
+                    </div>
+
+                    <div className="row" >
                         <div className='col-sm-3'>
                             <FormGroup md={10}>
                                 <span style={{ color: "#8fb339" }} htmlFor="qualifiedPersonContact">Contact Number *</span>
@@ -403,10 +518,6 @@ const DistributerProfile = () => {
                                 ></Errors>
                             </FormGroup>
                         </div>
-                    </div>
-
-                    <div className="row" >
-
                         <div className='col-sm-3'>
                             <FormGroup md={10}>
                                 <span style={{ color: "#8fb339" }} htmlFor="licenseValidUpto">License Valid Upto *</span>
@@ -416,7 +527,7 @@ const DistributerProfile = () => {
                                     className="form-control"
                                     value={licenseValidUpto}
                                     type={Date}
-                                    onChange={(e) => { setLicenseValidUpto(e.target.value) }}
+                                    disabled
                                     validators={{
                                         required
                                     }}
@@ -479,6 +590,10 @@ const DistributerProfile = () => {
                                 ></Errors>
                             </FormGroup>
                         </div>
+
+                    </div>
+
+                    <div className='row'>
                         <div className='col-sm-3'>
                             <FormGroup md={10}>
                                 <span style={{ color: "#8fb339" }} htmlFor="focalPersonContact">Contact Number *</span>
@@ -505,9 +620,6 @@ const DistributerProfile = () => {
                                 ></Errors>
                             </FormGroup>
                         </div>
-                    </div>
-
-                    <div className='row'>
                         <div className='col-sm-3'>
                             <span style={{ color: "#8fb339" }} htmlFor=" Confirm">Importer *</span>
                             <select onChange={handleChangeValue} style={{ border: '1px solid #8fb339', boxShadow: '0 0 0px #8fb339', }} class="form-select" aria-label="Default select example">
