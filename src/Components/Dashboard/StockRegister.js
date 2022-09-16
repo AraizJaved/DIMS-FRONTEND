@@ -19,6 +19,8 @@ import axios from 'axios';
 import Table from "./Table/table";
 import ReadOnlyRow from "./Table/ReadOnlyRow";
 import EditableRow from "./Table/EditableRow";
+import object from '../Services/getMedData';
+
 import { ContactSupportOutlined } from "@mui/icons-material";
 
 
@@ -29,6 +31,7 @@ const isNumber = (val) => !isNaN(Number(val));
 const Length = () => (val) => !val || val.length == 11;
 export default function StockRegister() {
     let history = useNavigate();
+    const [show, setShow] = useState(false);
     const [open, setOpen] = useState(false);
     const [open2, setOpen2] = useState(false);
     const [Msg, setMsg] = useState(false);
@@ -43,8 +46,11 @@ export default function StockRegister() {
     const [showButton, setShowButton] = useState(false);
     const [disbale, setDisable] = useState(false);
     const [medicine, setMedicine] = useState('');
-    let [MedData, setMedData] = useState([])
+    let [MedData, setMedData] = useState([]);
+    const [packSize, setPackSize] = useState("");
+    const [isOpen, setIsOpen] = useState(false);
     let _MedData = [];
+
     useEffect(() => {
         if (!showButton) {
             document.getElementById("finilize").style.display = "none"
@@ -61,7 +67,7 @@ export default function StockRegister() {
         expDate: "",
         mrp: "",
         qty: "",
-        qtyInUnits:""
+        qtyInUnits: ""
     });
 
     const [editdrugInfoId, setEditdrugInfoId] = useState(null);
@@ -120,7 +126,7 @@ export default function StockRegister() {
                 expDate: expDate,
                 mrp: mrp,
                 qty: qty,
-                qtyInUnits:qtyInUnits
+                qtyInUnits: qtyInUnits
             };
 
             const newdrugInfos = [...drugInfos, newdrugInfo];
@@ -143,7 +149,7 @@ export default function StockRegister() {
             expDate: editFormData.expDate,
             mrp: editFormData.mrp,
             qty: editFormData.qty,
-            qtyInUnits:editFormData.qtyInUnits
+            qtyInUnits: editFormData.qtyInUnits
         };
 
         const newdrugInfos = [...drugInfos];
@@ -157,7 +163,9 @@ export default function StockRegister() {
     };
 
     const handleEditClick = (event, drugInfo) => {
+        debugger
         setDisable(true);
+        setIsOpen(true);
         event.preventDefault();
         setEditdrugInfoId(drugInfo.id);
 
@@ -168,7 +176,7 @@ export default function StockRegister() {
             expDate: drugInfo?.expDate,
             mrp: drugInfo?.mrp,
             qty: drugInfo?.qty,
-            qtyInUnits:drugInfo?.qtyInUnits
+            qtyInUnits: drugInfo?.qtyInUnits
         };
 
         setEditFormData(formValues);
@@ -209,9 +217,7 @@ export default function StockRegister() {
     const sendData = () => {
         console.log('////////////////////////', drugInfos)
 
-        axios.post("http://localhost:3001/api/finilizeMedicine", {
-            values : drugInfos
-        }).then((res) => {
+        object.finilzeStockIn(drugInfos).then(() => {
             setdrugInfos([]);
             setShowButton(false)
             setOpen2(true);
@@ -242,12 +248,23 @@ export default function StockRegister() {
         }).then((res) => {
 
             setMrp(res.data.recordsets[0][0].MRP);
-            setQty(res.data.recordsets[0][0].PackSize);
-            setQtyInUnits((res.data.recordsets[0][0].MRP) * (res.data.recordsets[0][0].PackSize))
+            setPackSize(res.data.recordsets[0][0].PackSize)
             setProductName(res.data.recordsets[0][0].DrugName)
         }).catch(() => {
             console.log("error---------------!")
         })
+    }
+
+    const changeValues = (e) => {
+        debugger
+        console.log(e.target.value);
+        setQty(e.target.value)
+        const value = parseInt(e.target.value);
+        if (value > 0) {
+            setQtyInUnits(value * packSize);
+        } else {
+            setQtyInUnits("");
+        }
     }
     return (
         <>
@@ -315,30 +332,11 @@ export default function StockRegister() {
                         <div className="col-sm-4">
                             <FormGroup md={10}>
                                 <span style={{ color: "#8fb339" }} htmlFor="productName">Product Name *</span>
-                                {/* <Control.text style={{ border: '1px solid #8fb339', borderRadius: '8px', height: '35px', boxShadow: '0 0 0px #8fb339', }}
-                                    model=".productName"
-                                    placeholder="Product Name"
-                                    className="form-control"
-                                    value={productName}
-                                    onChange={(e) => { setProductName(e.target.value) }}
-                                    validators={{
-                                        required
-                                    }}
-                                />
-                                <Errors
-                                    className="text-danger"
-                                    model=".productName"
-                                    show="touched"
-                                    messages={{
-                                        required: "Product Name is required "
-                                    }}
-                                ></Errors> */}
                                 <Combobox
                                     data={MedData}
                                     textField="name"
                                     value={medicine}
                                     onChange={(e) => { changeValue(e) }}
-                                // hideEmptyPopup
                                 />
                             </FormGroup>
                         </div>
@@ -447,15 +445,14 @@ export default function StockRegister() {
                         </div>
                         <div className="col-sm-4">
                             <FormGroup md={10}>
-                                <span style={{ color: "#8fb339" }} htmlFor="qty">Qunatity *</span>
+                                <span style={{ color: "#8fb339" }} htmlFor="qty">Quantity *</span>
                                 <Control.text style={{ border: '1px solid #8fb339', borderRadius: '8px', height: '35px', boxShadow: '0 0 0px #8fb339' }}
                                     model=".qty"
                                     placeholder="Enter qunatity"
                                     className="form-control"
                                     value={qty}
-                                    disabled
-                                    maxLength='11'
-                                    onChange={(e) => { setQty(e.target.value) }}
+                                    type='number'
+                                    onChange={(e) => { changeValues(e) }}
                                     validators={{
                                         required
                                     }}
@@ -478,7 +475,7 @@ export default function StockRegister() {
                                     className="form-control"
                                     value={qtyInUnits}
                                     disabled
-                                    onChange={(e) => { setQtyInUnits(mrp * qty) }}
+                                    onChange={(e) => { setQtyInUnits(packSize * qty) }}
                                     validators={{
                                         required
                                     }}
@@ -508,17 +505,17 @@ export default function StockRegister() {
             </LocalForm>
             <div className="container" style={{ marginTop: '20px' }}>
                 <form onSubmit={handleEditFormSubmit}>
-                    <table class="table table-hover">
+                    <table className="table">
                         <thead>
                             <tr>
-                                <th scope="col">Product Name</th>
-                                <th scope="col">Opening Balance</th>
-                                <th scope="col">Batch</th>
-                                <th scope="col">Expiry Date</th>
-                                <th scope="col">MRP/Pack</th>
-                                <th scope="col">Qunatity</th>
-                                <th scope="col">Edit</th>
-                                <th scope="col">Delete</th>
+                                <th scope="row">Product Name</th>
+                                <th scope="row">Opening Balance</th>
+                                <th scope="row">Batch</th>
+                                <th scope="row">Expiry Date</th>
+                                <th scope="row">MRP/Pack</th>
+                                <th scope="row">Qunatity</th>
+                                <th scope="row">Edit</th>
+                                <th scope="row">Delete</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -529,6 +526,7 @@ export default function StockRegister() {
                                             editFormData={editFormData}
                                             handleEditFormChange={handleEditFormChange}
                                             handleCancelClick={handleCancelClick}
+                                            // isOpen={isOpen}
                                         />
                                     ) : (
                                         <ReadOnlyRow

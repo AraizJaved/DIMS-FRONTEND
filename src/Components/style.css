@@ -20,7 +20,7 @@ li {
 }
 
 
-i {
+/* i {
   position: absolute;
   top: 38%;
   right: 70%;
@@ -29,7 +29,7 @@ i {
 i:hover {
   color: #00fcb6;
   cursor: pointer;
-}
+} */
 
 #photo {
   width: 100;

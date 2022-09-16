@@ -195,41 +195,6 @@ const DistributerProfile = () => {
             }
         }
     }
-
-    const options = [
-        { value: 'Attock', label: 'Attock' },
-        { value: 'Bahawalnagar', label: 'Bahawalnagar' },
-        { value: 'Bahawalpur', label: 'Bahawalpur' },
-        { value: 'Bhakkar', label: 'Bhakkar' },
-        { value: 'Chakwal', label: 'Chakwal' },
-        { value: 'Chiniot', label: 'Chiniot' },
-        { value: 'Dera Ghazi Khan', label: 'Dera Ghazi Khan' },
-        { value: 'Faisalabad', label: 'Faisalabad' },
-        { value: 'Gujranwala', label: 'Gujranwala' },
-        { value: 'Gujrat', label: 'Gujrat' },
-        { value: 'Hafizabad', label: 'Hafizabad' },
-        { value: 'Jhang', label: 'Jhang' },
-        { value: 'Jhelum', label: 'Jhelum' },
-        { value: 'Kasur', label: 'Kasur' },
-        { value: 'Khanewal', label: 'Khanewal' },
-        { value: 'Khushab', label: 'Khushab' },
-        { value: 'Lahore', label: 'Lahore' },
-        { value: 'Layyah', label: 'Layyah' },
-        { value: 'Lodhran', label: 'Lodhran' },
-        { value: 'Mandi Bahuddin', label: 'Mandi Bahuddin' },
-        { value: 'Mianwali', label: 'Mianwali' },
-        { value: 'Multan', label: 'Multan' },
-        { value: 'Muzaffargarh', label: 'Muzaffargarh' },
-        { value: 'Nankana Sahib', label: 'Nankana Sahib' },
-        { value: 'Narowal', label: 'Narowal' },
-        { value: 'Okara', label: 'Okara' },
-        { value: 'Pakpattan', label: 'Pakpattan' },
-        { value: 'Rahim Yar Khan', label: 'Rahim Yar Khan' },
-        { value: 'Rajanpur', label: 'Rajanpur' },
-        { value: 'Rawalpindi', label: 'Rawalpindi' },
-        { value: 'Sahiwal', label: 'Sahiwal' }
-    ];
-
     return (
         <div>
             <Header />
