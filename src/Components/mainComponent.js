@@ -8,6 +8,8 @@ import DistributerProfile from "./Dashboard/DistributerProfile";
 import DrugProfile from "./Dashboard/DrugProfile";
 import StockRegister from './Dashboard/StockRegister';
 import SaleRegsiter from './Dashboard/SaleRegister';
+import StockinHistory from './Dashboard/stockinHistory';
+import StockoutHistory from './Dashboard/stockoutHistory';
 
 import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom'
 
@@ -24,6 +26,8 @@ export default function MainComponent() {
                     <Route path="/dashboard/DrugProfile" element={<DrugProfile />} />
                     <Route path="/dashboard/StockRegister" element={<StockRegister />} />
                     <Route path="/dashboard/SaleRegsiter" element={<SaleRegsiter />} />
+                    <Route path="/dashboard/StockinHistory" element={<StockinHistory />} />
+                    <Route path="/dashboard/StockoutHistory" element={<StockoutHistory />} />
                     <Route path="/" element={<LoginComponent />} />
                 </Routes>
             </Router>

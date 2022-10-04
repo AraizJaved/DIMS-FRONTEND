@@ -4,9 +4,6 @@ import axios from "axios";
 const object = {
 
     getMedData() {
-
-        // debugger
-        // const medData = null;
         return axios.post('http://localhost:3001/api/essentailDrugList');
     },
 
@@ -58,6 +55,20 @@ const object = {
             productName:productName,
             batch:batch,
             qty: qty
+        })
+    },
+
+    getStockin(from,to){
+        return axios.post("http://localhost:3001/api/getStockin",{
+            from:from,
+            to:to
+        })
+    },
+
+    getStockout(from,to){
+        return axios.post("http://localhost:3001/api/getStockout",{
+            from:from,
+            to:to
         })
     }
 }

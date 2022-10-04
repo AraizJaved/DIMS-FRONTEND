@@ -31,7 +31,6 @@ const isNumber = (val) => !isNaN(Number(val));
 const Length = () => (val) => !val || val.length == 11;
 export default function StockRegister() {
     let history = useNavigate();
-    const [show, setShow] = useState(false);
     const [open, setOpen] = useState(false);
     const [open2, setOpen2] = useState(false);
     const [Msg, setMsg] = useState(false);
@@ -87,7 +86,7 @@ export default function StockRegister() {
     const handleAddFormSubmit = (event) => {
         event.preventDefault();
 
-        if (productName === "") {
+        if (productName === "" && medicine === "") {
             setMsg("Please enter product name");
             setOpen(true);
             return setMsg;
@@ -129,6 +128,8 @@ export default function StockRegister() {
                 qtyInUnits: qtyInUnits
             };
 
+            console.log('##########################', newdrugInfo);
+
             const newdrugInfos = [...drugInfos, newdrugInfo];
             setdrugInfos(newdrugInfos);
             console.log(drugInfos)
@@ -138,18 +139,20 @@ export default function StockRegister() {
     };
 
     const handleEditFormSubmit = (event) => {
+        debugger
         event.preventDefault();
         setDisable(false);
+        setIsOpen(false);
 
         const editeddrugInfo = {
             id: editdrugInfoId,
-            productName: editFormData.productName,
-            openingBlnc: editFormData.openingBlnc,
-            batch: editFormData.batch,
-            expDate: editFormData.expDate,
-            mrp: editFormData.mrp,
-            qty: editFormData.qty,
-            qtyInUnits: editFormData.qtyInUnits
+            productName: productName,
+            openingBlnc: openingBlnc,
+            batch: batch,
+            expDate: expDate,
+            mrp: mrp,
+            qty: qty,
+            qtyInUnits: qtyInUnits
         };
 
         const newdrugInfos = [...drugInfos];
@@ -160,10 +163,11 @@ export default function StockRegister() {
 
         setdrugInfos(newdrugInfos);
         setEditdrugInfoId(null);
+        resetForm();
     };
 
     const handleEditClick = (event, drugInfo) => {
-        debugger
+        // debugger
         setDisable(true);
         setIsOpen(true);
         event.preventDefault();
@@ -179,7 +183,14 @@ export default function StockRegister() {
             qtyInUnits: drugInfo?.qtyInUnits
         };
 
-        setEditFormData(formValues);
+        setMedicine(formValues.productName);
+        setProductName(formValues.productName);
+        setOpeningBlnc(formValues.openingBlnc);
+        setBatch(formValues.batch)
+        setExpDate(formValues.expDate);
+        setMrp(formValues.mrp);
+        setQty(formValues.qty);
+        setQtyInUnits(formValues.qtyInUnits);
     };
 
     const handleCancelClick = () => {
@@ -200,7 +211,8 @@ export default function StockRegister() {
         newdrugInfos.splice(index, 1);
 
         setdrugInfos(newdrugInfos);
-        setShowButton(false)
+        if(drugInfos.length === 0)  
+            setShowButton(false)
     }
 
     const resetForm = () => {
@@ -250,6 +262,7 @@ export default function StockRegister() {
             setMrp(res.data.recordsets[0][0].MRP);
             setPackSize(res.data.recordsets[0][0].PackSize)
             setProductName(res.data.recordsets[0][0].DrugName)
+            console.log('----------------------------', res.data.recordsets[0][0].DrugName)
         }).catch(() => {
             console.log("error---------------!")
         })
@@ -270,7 +283,8 @@ export default function StockRegister() {
         <>
             <Header />
             <ArrowBackIcon />
-            <button onClick={(() => { history("../dashboard", { replace: true }) })} class="button-solid">go back to Dashboard</button>
+            <button onClick={(() => { history("../dashboard", { replace: true }) })} 
+            id="button-solid">go back to Dashboard</button>
             <Dialog
                 open={
                     open2 ? (
@@ -484,20 +498,39 @@ export default function StockRegister() {
                         </div>
                     </div>
                     <div style={{ paddingTop: '30px' }}>
-                        <Button className='mx-auto d-block'
-                            style={{
-                                width: '200px',
-                                background: '#8fb339',
-                                height: '40px',
-                                borderRadius: '10px',
-                                justifyContent: 'center',
-                                boxShadow: '0 0 0px #8fb339',
-                            }}
-                            onClick={(e) => { handleAddFormSubmit(e) }}
+                        {
+                            !isOpen ? (
+                                <Button className='mx-auto d-block'
+                                    style={{
+                                        width: '200px',
+                                        background: '#8fb339',
+                                        height: '40px',
+                                        borderRadius: '10px',
+                                        justifyContent: 'center',
+                                        boxShadow: '0 0 0px #8fb339',
+                                    }}
+                                    onClick={(e) => { handleAddFormSubmit(e) }}
 
-                            size='md'>
-                            Save
-                        </Button>
+                                    size='md'>
+                                    Save
+                                </Button>
+                            ) : (
+                                <Button className='mx-auto d-block'
+                                    style={{
+                                        width: '200px',
+                                        background: '#8fb339',
+                                        height: '40px',
+                                        borderRadius: '10px',
+                                        justifyContent: 'center',
+                                        boxShadow: '0 0 0px #8fb339',
+                                    }}
+                                    onClick={(e) => { handleEditFormSubmit(e) }}
+
+                                    size='md'>
+                                    Update
+                                </Button>
+                            )
+                        }
                     </div>
 
                 </div>
@@ -521,20 +554,11 @@ export default function StockRegister() {
                         <tbody>
                             {drugInfos.map((drugInfo) => (
                                 <Fragment>
-                                    {editdrugInfoId === drugInfo.id ? (
-                                        <EditableRow
-                                            editFormData={editFormData}
-                                            handleEditFormChange={handleEditFormChange}
-                                            handleCancelClick={handleCancelClick}
-                                            // isOpen={isOpen}
-                                        />
-                                    ) : (
-                                        <ReadOnlyRow
-                                            drugInfo={drugInfo}
-                                            handleEditClick={handleEditClick}
-                                            handleDeleteClick={handleDeleteClick}
-                                        />
-                                    )}
+                                    <ReadOnlyRow
+                                        drugInfo={drugInfo}
+                                        handleEditClick={handleEditClick}
+                                        handleDeleteClick={handleDeleteClick}
+                                    />
                                 </Fragment>
                             ))}
                         </tbody>

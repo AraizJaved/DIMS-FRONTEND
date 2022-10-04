@@ -45,16 +45,19 @@ i:hover {
   margin-top: auto;
 }
 
-.button-solid {
+#button-solid {
   border: none;
-  background-color: white;
+  background-color: transparent;
   color: #8fb339;
+  outline: none;
+  position: relative;
+  bottom: 8px;
 }
 
-button-solid:focus {
+/* button-solid:focus {
   border: none;
   outline: none;
-}
+} */
 
 .dashboardCards:hover{
   cursor: pointer;

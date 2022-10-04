@@ -51,8 +51,7 @@ export default function StockRegister() {
     const [msName, setMsName] = useState("");
     const [options, setOptions] = useState([]);
     const [detail, setDetail] = useState([])
-    let temp = [];
-    // let options = [];
+    const [isOpen, setIsOpen] = useState(false);
     let _MedData = [];
     useEffect(() => {
         if (!showButton) {
@@ -161,34 +160,48 @@ export default function StockRegister() {
     };
 
     const handleEditFormSubmit = (event) => {
-        event.preventDefault();
-        setDisable(false);
 
-        const editeddrugInfo = {
-            id: editdrugInfoId,
-            licenseNo: editFormData.licenseNo,
-            msName: editFormData.msName,
-            productName: editFormData.productName,
-            openingBlnc: editFormData.openingBlnc,
-            batch: editFormData.batch,
-            expDate: editFormData.expDate,
-            mrp: editFormData.mrp,
-            qty: editFormData.qty,
-            qtyInUnits: editFormData.qtyInUnits
-        };
+        object.checkQuantity(productName, batch, qty).then((res) => {
+            debugger
+            console.log(batch);
+            if (res.data.recordset.length > 0) {
+                event.preventDefault();
+                setDisable(false);
+                setIsOpen(false);
+                resetForm();
+                const editeddrugInfo = {
+                    id: editdrugInfoId,
+                    licenseNo: editFormData.licenseNo,
+                    msName: editFormData.msName,
+                    productName: productName,
+                    openingBlnc: openingBlnc,
+                    batch: batch,
+                    expDate: expDate,
+                    mrp: mrp,
+                    qty: qty,
+                    qtyInUnits: qtyInUnits
+                };
 
-        const newdrugInfos = [...drugInfos];
+                const newdrugInfos = [...drugInfos];
 
-        const index = drugInfos.findIndex((drugInfo) => drugInfo.id === editdrugInfoId);
+                const index = drugInfos.findIndex((drugInfo) => drugInfo.id === editdrugInfoId);
 
-        newdrugInfos[index] = editeddrugInfo;
+                newdrugInfos[index] = editeddrugInfo;
 
-        setdrugInfos(newdrugInfos);
-        setEditdrugInfoId(null);
+                setdrugInfos(newdrugInfos);
+                setEditdrugInfoId(null);
+            } else {
+                setOpen(true);
+                setMsg("Quantity not available");
+            }
+        }).catch((err) => {
+            console.log(err.message);
+        })
     };
 
     const handleEditClick = (event, drugInfo) => {
         setDisable(true);
+        setIsOpen(true);
         event.preventDefault();
         setEditdrugInfoId(drugInfo.id);
 
@@ -204,7 +217,15 @@ export default function StockRegister() {
             qtyInUnits: drugInfo?.qtyInUnits
         };
 
-        setEditFormData(formValues);
+        setMedicine(formValues.productName);
+        setProductName(formValues.productName);
+        setOpeningBlnc(formValues.openingBlnc);
+        // setBatch(formValues.batch)
+        setExpDate(formValues.expDate);
+        setMrp(formValues.mrp);
+        setQty(formValues.qty);
+        setQtyInUnits(formValues.qtyInUnits);
+        setBatch("")
     };
 
     const handleCancelClick = () => {
@@ -225,7 +246,8 @@ export default function StockRegister() {
         newdrugInfos.splice(index, 1);
 
         setdrugInfos(newdrugInfos);
-        setShowButton(false)
+        if (drugInfos.length === 0)
+            setShowButton(false)
     }
 
     const resetForm = () => {
@@ -241,7 +263,7 @@ export default function StockRegister() {
         setMsName("");
         setDetail([]);
         setOptions([]);
-        console.log('........................',setDetail);
+        console.log('........................', setDetail);
     }
 
     const sendData = () => {
@@ -264,6 +286,14 @@ export default function StockRegister() {
     }
     const changeValue = (e) => {
         // console.log(" i am cjdsjhdsjkflicked", e);
+        setOpeningBlnc("");
+        setBatch("");
+        setExpDate("");
+        setMrp("");
+        setQty("");
+        setQtyInUnits("");
+        setDetail([]);
+        setOptions([]);
         setMedicine(e)
         // debugger
         axios.post('http://localhost:3001/api/getMedicines', {
@@ -320,36 +350,34 @@ export default function StockRegister() {
             }
         }
     }
-    let items = []
-    const changeBatch = useCallback(async (e) => {
+    async function changeBatch(e) {
         debugger
+
         setBatch(e.target.value);
         console.log("i am clicked...!");
-        // console.log(e[0]);
-
         let res = await object.findBatchNo(productName)
         setOptions([...options, res.data.recordsets])
-        options?.forEach((res) => {
-            // let temp=[];
+        res.data.recordsets?.forEach((res) => {
+            debugger
             res?.forEach((res2) => {
-                res2.forEach((res3) => {
-                    if (detail.length < 2) {
-                        detail.push(res3);
-                    }
-                })
+                debugger
+                console.log(res2);
+                if (detail.length < 2) {
+                    detail.push(res2);
+                } else {
+                    return
+                }
             })
         })
-        console.log(detail)
-        // console.log(res);
-    })
-    // console.log('as,kakld',options);
+    }
 
-    
+
     return (
         <>
             <Header />
             <ArrowBackIcon />
-            <button onClick={(() => { history("../dashboard", { replace: true }) })} class="button-solid">go back to Dashboard</button>
+            <button onClick={(() => { history("../dashboard", { replace: true }) })}
+                id="button-solid">go back to Dashboard</button>
             <Dialog
                 open={
                     open2 ? (
@@ -484,11 +512,16 @@ export default function StockRegister() {
                             </FormGroup>
                         </div>
                         <div className='col-sm-4'>
-                            <span style={{ color: "#8fb339" }} htmlFor="batch">Batch *</span>
-                            <select onClick={changeBatch} style={{ border: '1px solid #8fb339', boxShadow: '0 0 0px #8fb339', }} select class="form-select" aria-label="Default select example">
-                                <option>Select</option>
-                                {detail?.map((data) => <option value={data.Batch} >Batch({data.Batch})-Expriy({data.Expiry.split("T")[0]})-Quantity({data.Quantity})</option>)}
-                            </select>
+                            <FormGroup md={10}>
+                                <span style={{ color: "#8fb339" }} htmlFor="batch">Batch *</span>
+                                <br></br>
+                                <select onClick={(e) => changeBatch(e)}
+                                    style={{ border: '1px solid #8fb339', boxShadow: '0 0 0px #8fb339', borderRadius: '8px', height: '35px' }} select
+                                    className="form-control" aria-label="Default select example">
+                                    <option>Select</option>
+                                    {detail?.map((data) => <option value={data.Batch} >Batch({data.Batch})-Expriy({data.Expiry.split("T")[0]})-Quantity({data.Quantity})</option>)}
+                                </select>
+                            </FormGroup>
                         </div>
                         <div className='col-sm-4'>
                             <FormGroup md={10}>
@@ -555,10 +588,6 @@ export default function StockRegister() {
                                     value={mrp}
                                     maxLength='11'
                                     disabled
-                                    onChange={(e) => { setMrp(e.target.value) }}
-                                    validators={{
-                                        required
-                                    }}
                                 />
                                 <Errors
                                     className="text-danger"
@@ -611,20 +640,39 @@ export default function StockRegister() {
                         </div>
                     </div>
                     <div style={{ paddingTop: '30px' }}>
-                        <Button className='mx-auto d-block'
-                            style={{
-                                width: '200px',
-                                background: '#8fb339',
-                                height: '40px',
-                                borderRadius: '10px',
-                                justifyContent: 'center',
-                                boxShadow: '0 0 0px #8fb339',
-                            }}
-                            onClick={(e) => { handleAddFormSubmit(e) }}
+                        {
+                            !isOpen ? (
+                                <Button className='mx-auto d-block'
+                                    style={{
+                                        width: '200px',
+                                        background: '#8fb339',
+                                        height: '40px',
+                                        borderRadius: '10px',
+                                        justifyContent: 'center',
+                                        boxShadow: '0 0 0px #8fb339',
+                                    }}
+                                    onClick={(e) => { handleAddFormSubmit(e) }}
 
-                            size='md'>
-                            Save
-                        </Button>
+                                    size='md'>
+                                    Save
+                                </Button>
+                            ) : (
+                                <Button className='mx-auto d-block'
+                                    style={{
+                                        width: '200px',
+                                        background: '#8fb339',
+                                        height: '40px',
+                                        borderRadius: '10px',
+                                        justifyContent: 'center',
+                                        boxShadow: '0 0 0px #8fb339',
+                                    }}
+                                    onClick={(e) => { handleEditFormSubmit(e) }}
+
+                                    size='md'>
+                                    Update
+                                </Button>
+                            )
+                        }
                     </div>
 
                 </div>
@@ -648,19 +696,11 @@ export default function StockRegister() {
                         <tbody>
                             {drugInfos.map((drugInfo) => (
                                 <Fragment>
-                                    {editdrugInfoId === drugInfo.id ? (
-                                        <EditableRow
-                                            editFormData={editFormData}
-                                            handleEditFormChange={handleEditFormChange}
-                                            handleCancelClick={handleCancelClick}
-                                        />
-                                    ) : (
-                                        <ReadOnlyRow
-                                            drugInfo={drugInfo}
-                                            handleEditClick={handleEditClick}
-                                            handleDeleteClick={handleDeleteClick}
-                                        />
-                                    )}
+                                    <ReadOnlyRow
+                                        drugInfo={drugInfo}
+                                        handleEditClick={handleEditClick}
+                                        handleDeleteClick={handleDeleteClick}
+                                    />
                                 </Fragment>
                             ))}
                         </tbody>

@@ -199,7 +199,8 @@ const DistributerProfile = () => {
         <div>
             <Header />
             <ArrowBackIcon />
-            <button onClick={(() => { history("../dashboard", { replace: true }) })} class="button-solid">go back to Dashboard</button>
+            <button onClick={(() => { history("../dashboard", { replace: true }) })} 
+            id="button-solid">go back to Dashboard</button>
             <Dialog
                 open={
                     open2 ? (
@@ -587,11 +588,16 @@ const DistributerProfile = () => {
                         </div>
                         <div className='col-sm-3'>
                             <span style={{ color: "#8fb339" }} htmlFor=" Confirm">Importer *</span>
-                            <select onChange={handleChangeValue} style={{ border: '1px solid #8fb339', boxShadow: '0 0 0px #8fb339', }} class="form-select" aria-label="Default select example">
-                                <option selected>Select</option>
-                                <option value="Yes">Yes</option>
-                                <option selected value="No">No</option>
-                            </select>
+                            <div >
+                                <select style={{ border: '1px solid #8fb339', boxShadow: '0 0 0px #8fb339', borderRadius: '8px', height: '35px' }}
+                                        onChange={handleChangeValue} 
+                                        class="form-control" 
+                                        aria-label="Default select example">
+                                    <option selected>Select</option>
+                                    <option value="Yes">Yes</option>
+                                    <option selected value="No">No</option>
+                                </select>
+                            </div>
                         </div>
                         <div id="araiz" className="licenseNum col-sm-3">
                             <FormGroup md={10}>

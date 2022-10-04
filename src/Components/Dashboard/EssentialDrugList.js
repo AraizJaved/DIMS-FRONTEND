@@ -10,10 +10,12 @@ const EssentialDrugList = () => {
         <div>
             <Header />
 
-            <ArrowBackIcon />
-            <button onClick={(() => { history("../dashboard", { replace: true }) })} class="button-solid">go back to Dashboard</button>
+            <ArrowBackIcon  />
+            <button onClick={(() => { history("../dashboard", { replace: true }) })} 
+            id="button-solid"
+            
+            >go back to Dashboard</button>
             <Table></Table>
-        
         </div>
     )
 }

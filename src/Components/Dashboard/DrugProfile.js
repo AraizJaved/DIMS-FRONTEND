@@ -212,7 +212,8 @@ const DrugProfile = () => {
             <Header />
 
             <ArrowBackIcon />
-            <button onClick={(() => { history("../dashboard", { replace: true }) })} class="button-solid">go back to Dashboard</button>
+            <button onClick={(() => { history("../dashboard", { replace: true }) })} 
+            id="button-solid">go back to Dashboard</button>
             <Dialog
                 open={
                     open2 ? (
@@ -349,7 +350,14 @@ const DrugProfile = () => {
                         </div>
                         <div className='col-sm-3'>
                             <span style={{ color: "#8fb339" }} htmlFor=" Confirm">Importer *</span>
-                            <select onChange={handleChangeCounties} style={{ border: '1px solid #8fb339', boxShadow: '0 0 0px #8fb339', }} select class="form-select" aria-label="Default select example">
+
+                            <select onChange={handleChangeCounties}
+                                style={{
+                                    border: '1px solid #8fb339', boxShadow: '0 0 0px #8fb339',
+                                    borderRadius: '8px', height: '35px'
+                                }}
+                                select
+                                class="form-control" aria-label="Default select example">
                                 <option value="Pakistan">Pakistan</option>
                                 {options.map(({ value, label }, index) => <option value={label} >{label}</option>)}
                             </select>
@@ -511,7 +519,14 @@ const DrugProfile = () => {
                     <div className='row'>
                         <div className='col-sm-3'>
                             <span style={{ color: "#8fb339" }} htmlFor=" Confirm">Dosage Form *</span>
-                            <select onChange={handleChangeDosafeForm} style={{ border: '1px solid #8fb339', boxShadow: '0 0 0px #8fb339', }} select class="form-select" aria-label="Default select example">
+                            <select onChange={handleChangeDosafeForm}
+                                style={{
+                                    border: '1px solid #8fb339', boxShadow: '0 0 0px #8fb339',
+                                    borderRadius: '8px', height: '35px'
+                                }}
+                                select
+                                class="form-control"
+                                aria-label="Default select example">
                                 <option >Select Dosage Form</option>
                                 <option value="GEL METERED">GEL, METERED</option>
                                 <option value="INJECTABLE">INJECTABLE</option>
@@ -547,7 +562,14 @@ const DrugProfile = () => {
                         </div>
                         <div className='col-sm-3'>
                             <span style={{ color: "#8fb339" }} htmlFor=" Confirm">Units *</span>
-                            <select onChange={handleChangeUnits} style={{ border: '1px solid #8fb339', boxShadow: '0 0 0px #8fb339', }} select class="form-select" aria-label="Default select example">
+                            <select onChange={handleChangeUnits}
+                                style={{
+                                    border: '1px solid #8fb339', boxShadow: '0 0 0px #8fb339',
+                                    borderRadius: '8px', height: '35px'
+                                }}
+                                select
+                                class="form-control"
+                                aria-label="Default select example">
                                 <option>Select</option>
                                 <option value='mg'>mg</option>
                                 <option value='ml'>ml</option>
@@ -584,7 +606,14 @@ const DrugProfile = () => {
                     <div className='row' style={{ marginTop: '20px' }}>
                         <div className='col-sm-3'>
                             <span style={{ color: "#8fb339" }} htmlFor=" Confirm">Units *</span>
-                            <select onChange={handleChangeVolUnits} style={{ border: '1px solid #8fb339', boxShadow: '0 0 0px #8fb339', }} select class="form-select" aria-label="Default select example">
+                            <select onChange={handleChangeVolUnits} 
+                               style={{
+                                border: '1px solid #8fb339', boxShadow: '0 0 0px #8fb339', 
+                                borderRadius: '8px',height: '35px'
+                            }} 
+                            select 
+                            class="form-control"
+                            aria-label="Default select example">
                                 <option>Select</option>
                                 <option value='mg'>mg</option>
                                 <option value='ml'>ml</option>

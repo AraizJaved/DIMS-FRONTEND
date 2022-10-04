@@ -2,78 +2,95 @@ import React, { useEffect, useState, useRef } from "react";
 import cloneDeep from "lodash/cloneDeep";
 import Pagination from "rc-pagination";
 import "rc-pagination/assets/index.css";
-import object from "../../Services/getMedData";
+import object from "../../../Services/getMedData";
 import { DownloadTableExcel } from 'react-export-table-to-excel';
 
-const tableHead = {
-  MainCategory: "MainCategory",
-  Subcategory1: "Subcategory1",
-  Subcategory2: "Subcategory2",
-  Subcategory3: "Subcategory3",
-  Subcategory4: "Subcategory4",
-  Drug: "Drug"
-
-  // name:"name",
-  // parentId:"parentId",
-  // campaignType:"campaignType",
-  // status:"status",
-  // channel:"channel",
-  // action:"action"
-};
-const Table = () => {
+const Table = ({ stock }) => {
   const tableRef = useRef(null);
   const [medData, setMedData] = useState([]);
   const [excelData, setExcelData] = useState([]);
   const countPerPage = 10;
   const [currentPage, setCurrentPage] = React.useState(1);
+  const [filename] = useState(`${stock} history`)
   const [collection, setCollection] = React.useState(
     cloneDeep(medData?.slice(0, countPerPage))
   );
+
+  const tableHead = {
+    ProductName: "Medicine",
+    Batch: "Batch",
+    Expiry: "Expiry",
+    MRP: "MRP",
+    Quantity: "Quantity",
+    QuantityInUnits: "QuantityInUnits"
+  };
+
   useEffect(() => {
-    object.getMedData().then((res) => {
-      setMedData(res.data.recordset);
-      setCurrentPage(1);
-      const to = countPerPage * 1;
-      const from = to - countPerPage;
-      setCollection(cloneDeep(res.data.recordset.slice(from, to)));
-      setExcelData(res.data.recordset);
-    }).catch((err) => {
-      console.log(err.message);
-    })
+    // debugger
+    if (stock === "stockin") {
+      object.getStockin().then((res) => {
+        setMedData(res.data.recordset);
+        setCurrentPage(1);
+        const to = countPerPage * 1;
+        const from = to - countPerPage;
+        setCollection(cloneDeep(res.data.recordset.slice(from, to)));
+        setExcelData(res.data.recordset);
+      }).catch((err) => {
+        console.log(err.message);
+      })
+    } else if (stock === "stockout") {
+      object.getStockout().then((res) => {
+        setMedData(res.data.recordset);
+        setCurrentPage(1);
+        const to = countPerPage * 1;
+        const from = to - countPerPage;
+        setCollection(cloneDeep(res.data.recordset.slice(from, to)));
+        setExcelData(res.data.recordset);
+      }).catch((err) => {
+        console.log(err.message);
+      })
+    }
   }, [])
+
+  console.log('----------------------------------', medData);
+
   function updatePage(p) {
-    debugger
+    // debugger
     setCurrentPage(p);
     const to = countPerPage * p;
     const from = to - countPerPage;
     setCollection(cloneDeep(medData.slice(from, to)));
   };
 
-  const tableRows = rowData => {
+  const tableRows = (rowData) => {
     const { key, index } = rowData;
     const tableCell = Object.keys(tableHead);
     const columnData = tableCell.map((keyD, i) => {
+      debugger
+      if (keyD === "Expiry") {
+        key[keyD] = key["Expiry"].split("T")[0]
+      }
       return <td key={i}>{key[keyD]}</td>;
     });
 
     return <tr key={index}>{columnData}</tr>;
-  };
-
-  const tableData = () => {
+  }
+  function tableData(collection) {
+    debugger
     return collection?.map((key, index) => tableRows({ key, index }));
-  };
+  }
 
-  const headRow = () => {
-    return Object.values(tableHead).map((title, index) => (
+  function headRow() {
+    debugger
+    return Object.values(tableHead)?.map((title, index) => (
       <td key={index}>{title}</td>
     ));
-  };
-
+  }
   return (
     <>
       <div className="container">
         <DownloadTableExcel
-          filename="Essential Drug List"
+          filename={`${stock} history`}
           sheet="users"
           currentTableRef={tableRef.current}
 
@@ -107,11 +124,18 @@ const Table = () => {
           <tbody hidden className="trhover">{excelData?.map((key, index) => tableRows({ key, index }))}</tbody>
         </table>
 
-        <table >
+        <table className="table" >
           <thead>
-            <tr>{headRow()}</tr>
+            <tr>
+              <th scope="row">Product Name</th>
+              <th scope="row">Batch</th>
+              <th scope="row">Expiry</th>
+              <th scope="row">MRP </th>
+              <th scope="row">Quantity</th>
+              <th scope="row">Quantity In Units</th>
+            </tr>
           </thead>
-          <tbody className="trhover">{tableData()}</tbody>
+          <tbody >{tableData(collection)}</tbody>
         </table>
         <Pagination
           pageSize={countPerPage}
